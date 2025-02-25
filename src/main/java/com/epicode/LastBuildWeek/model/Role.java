@@ -8,7 +8,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 
 @Data
 @Entity
@@ -23,7 +25,21 @@ public class Role {
 
     @Enumerated(EnumType.STRING)
     private UserRole name;
-    @ManyToMany(mappedBy = "roles")
+    @ManyToMany(mappedBy = "roles",fetch = FetchType.EAGER)
     @JsonIgnore
-    private Set<User> users = new HashSet<>();
+    private Set<User> users = new CopyOnWriteArraySet<>();
+
+    @Override
+    public String toString() {
+        return "Role{" +
+                "id=" + id +
+                ", name=" + name +
+                ", users=" + users +
+                '}';
+    }
+
+    @Override
+    public int hashCode() {
+        return id != null ? id.hashCode() : 0;
+    }
 }

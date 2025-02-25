@@ -11,9 +11,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,18 +29,18 @@ public class UserService {
     RoleRepository roleRepository;
 
 
-    public UserDTO registerUser(UserDTO userDTO, UserRole roleType){
-//        if (userRepository.existsByEmail(userDTO.getEmail())){
-//            throw new IllegalStateException("Email già in uso!");
-//        }
-        Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.findByName(roleType).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
-        roles.add(role);
-        User user = userMapperDTO.toEntity(userDTO);
-        user.setRoles(roles);
-        user = userRepository.save(user);
-        return userMapperDTO.toDto(user);
-    }
+//    public UserDTO registerUser(UserDTO userDTO, UserRole roleType){
+////        if (userRepository.existsByEmail(userDTO.getEmail())){
+////            throw new IllegalStateException("Email già in uso!");
+////        }
+//        Set<UserRole> roles = new CopyOnWriteArraySet<>();
+////        Role role = roleRepository.findByName(roleType).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
+//        roles.add(UserRole.valueOf("USER"));
+//        User user = userMapperDTO.toEntity(userDTO);
+//        user.setRoles(roles);
+//        user = userRepository.save(user);
+//        return userMapperDTO.toDto(user);
+//    }
 
     public UserDTO getUserById(Long id){
         User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
@@ -61,5 +63,29 @@ public class UserService {
         user = userMapperDTO.updateUser(userDTO,user);
         user = userRepository.save(user);
         return userMapperDTO.toDto(user);
+    }
+
+    public User createUser(UserDTO userDTO) {
+        User user = new User();
+        user.setUsername(userDTO.getUsername());
+        user.setEmail(userDTO.getEmail());
+        user.setPassword(userDTO.getPassword());
+
+        Set<Role> roles = new HashSet<>();
+
+        for (Role roleName : userDTO.getRoles()) {
+            Role role = roleRepository.findByName(UserRole.valueOf(UserRole.USER.name()))
+                    .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+            roles.add(role);
+        }
+        user.setRoles(roles);
+        user.setRoles(roles);
+        roles.forEach(System.out::println);
+        for (Role role : user.getRoles()) {
+            role.getUsers().add(user);
+        }
+
+        System.out.println("🔍 User Roles Before Save: " + user.getRoles());
+        return userRepository.save(user);
     }
 }
