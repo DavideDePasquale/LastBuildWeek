@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Data
@@ -26,4 +27,12 @@ public class Role {
     @ManyToMany(mappedBy = "roles")
     @JsonIgnore
     private Set<User> users = new HashSet<>();
+
+
+    // Importante!!!!!!!!!!!!!!
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, name);
+    }
+
 }

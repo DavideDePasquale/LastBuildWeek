@@ -11,6 +11,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,18 +28,30 @@ public class UserService {
     RoleRepository roleRepository;
 
 
-    public UserDTO registerUser(UserDTO userDTO, UserRole roleType){
-//        if (userRepository.existsByEmail(userDTO.getEmail())){
-//            throw new IllegalStateException("Email già in uso!");
-//        }
-        Set<Role> roles = new HashSet<>();
-        Role role = roleRepository.findByName(roleType).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
-        roles.add(role);
+    public UserDTO registerUser(UserDTO userDTO, UserRole roleType) {
+
+        if (userRepository.existsByEmail(userDTO.getEmail())) {
+            throw new IllegalStateException("Email già in uso!");
+        }
+
+
+        Role role = roleRepository.findByName(roleType)
+                .orElseThrow(() -> new RuntimeException("Ruolo non trovato"));
+
+
         User user = userMapperDTO.toEntity(userDTO);
+
+        // Importante!!!!!!!!!!!!!!
+        Set<Role> roles = user.getRoles() != null ? Collections.synchronizedSet(new HashSet<>(user.getRoles())) : new HashSet<>();
+        roles.add(role);
         user.setRoles(roles);
+
         user = userRepository.save(user);
+
         return userMapperDTO.toDto(user);
     }
+
+
 
     public UserDTO getUserById(Long id){
         User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
