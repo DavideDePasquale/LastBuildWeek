@@ -1,6 +1,7 @@
 package com.epicode.LastBuildWeek.controller;
 
 import com.epicode.LastBuildWeek.enumeration.UserRole;
+import com.epicode.LastBuildWeek.model.User;
 import com.epicode.LastBuildWeek.payload.UserDTO;
 import com.epicode.LastBuildWeek.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,8 +20,8 @@ public class UserController {
     UserService userService;
 
 
-    @GetMapping
-    public ResponseEntity<List<UserDTO>> getAllUsers(){
+    @GetMapping("/all")
+    public ResponseEntity<List<User>> getAllUsers(){
         return ResponseEntity.ok(userService.getAllUser());
     }
     @GetMapping("/{id}")

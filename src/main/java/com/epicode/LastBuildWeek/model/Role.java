@@ -1,6 +1,7 @@
 package com.epicode.LastBuildWeek.model;
 
 import com.epicode.LastBuildWeek.enumeration.UserRole;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,5 +24,6 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private UserRole name;
     @ManyToMany(mappedBy = "roles")
+    @JsonIgnore
     private Set<User> users = new HashSet<>();
 }
