@@ -29,9 +29,9 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO){
-        UserDTO dto = userService.registerUser(userDTO, UserRole.USER);
-        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
+    public ResponseEntity<User> registerUser(@RequestBody UserDTO userDTO){
+        User user = userService.createUser(userDTO);
+        return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUser(@PathVariable Long id){
