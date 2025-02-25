@@ -13,12 +13,13 @@ import java.util.Set;
 @Data
 public class UserDTO {
 
+
     private String username;
     private String email;
     private String password;
     private String nome;
     private String cognome;
     private String avatar;
-    private String roles;
+    private Set<Role> roles;
 
 }

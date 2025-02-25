@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface InvoiceRepository extends JpaRepository<Invoice,Long> {
-    List<Invoice> findByClient_Id(Long clientId);
+    List<Invoice> findAllByClient_Id(Long clientId);
     List<Invoice> findByDataBetween(LocalDateTime startDate, LocalDateTime endDate);
     List<Invoice> findByImportoGreaterThan(BigDecimal amount);
 }

@@ -46,7 +46,7 @@ public class ClientService {
 
     public ClientDTO updateClient(Long id, ClientDTO clientDTO){
         Client client = clientRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Utente non trovato"));
-        client = clientMapperDTO.toEntity(clientDTO);
+        client = clientMapperDTO.updateMapper(client,clientDTO);
         client = clientRepository.save(client);
         return clientMapperDTO.toDto(client);
     }

@@ -16,6 +16,7 @@ import java.util.List;
 @Data
 public class ClientDTO {
 
+    private Long id;
     private String ragioneSociale;
     private String partitaIva;
     private String email;

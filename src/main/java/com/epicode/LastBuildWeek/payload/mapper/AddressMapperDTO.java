@@ -4,8 +4,13 @@ import com.epicode.LastBuildWeek.model.Address;
 import com.epicode.LastBuildWeek.model.Client;
 import com.epicode.LastBuildWeek.payload.AddressDTO;
 import com.epicode.LastBuildWeek.repository.ClientRepository;
+import jakarta.persistence.EntityNotFoundException;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
+@Data
+@Component
 public class AddressMapperDTO {
 
     @Autowired
@@ -34,4 +39,30 @@ public class AddressMapperDTO {
         entity.setLocalita(dto.getLocalita());
         return entity;
     }
+
+    public Address updateAddress(AddressDTO addressDTO,Address address){
+        if (addressDTO.getCap() != null){
+            address.setCap(addressDTO.getCap());
+        }
+        if (addressDTO.getTipo() != null){
+            address.setTipo(addressDTO.getTipo());
+        }
+        if (addressDTO.getComune() != null){
+            address.setComune(addressDTO.getComune());
+        }
+        if (addressDTO.getClient_id() != null){
+            address.setClient(clientRepository.findById(addressDTO.getClient_id()).orElseThrow(()-> new EntityNotFoundException("Cliente non trovato")));
+        }
+        if (addressDTO.getCivico() != null){
+            address.setCivico(addressDTO.getCivico());
+        }
+        if (addressDTO.getVia() != null){
+            address.setVia(addressDTO.getVia());
+        }
+        if (addressDTO.getLocalita() != null){
+            address.setLocalita(addressDTO.getLocalita());
+        }
+        return address;
+    }
+
 }

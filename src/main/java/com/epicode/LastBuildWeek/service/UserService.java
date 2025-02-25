@@ -53,4 +53,10 @@ public class UserService {
         }
         userRepository.deleteById(id);
     }
+    public UserDTO updateUser(Long id,UserDTO userDTO){
+        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
+        user = userMapperDTO.updateUser(userDTO,user);
+        user = userRepository.save(user);
+        return userMapperDTO.toDto(user);
+    }
 }
