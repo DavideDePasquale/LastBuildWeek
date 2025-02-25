@@ -20,6 +20,6 @@ public class UserDTO {
     private String nome;
     private String cognome;
     private String avatar;
-    private Set<Role> roles;
+    private Set<String> roles = new HashSet<>();
 
 }

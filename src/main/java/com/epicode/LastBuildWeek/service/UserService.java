@@ -20,59 +20,58 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
-    @Autowired
-    UserRepository userRepository;
-    @Autowired
-    UserMapperDTO userMapperDTO;
-    @Autowired
-    RoleRepository roleRepository;
+  @Autowired UserRepository userRepository;
+  @Autowired UserMapperDTO userMapperDTO;
+  @Autowired RoleRepository roleRepository;
 
+  public UserDTO registerUser(UserDTO userDTO) {
 
-    public UserDTO registerUser(UserDTO userDTO, UserRole roleType) {
-
-        if (userRepository.existsByEmail(userDTO.getEmail())) {
-            throw new IllegalStateException("Email già in uso!");
-        }
-
-
-        Role role = roleRepository.findByName(roleType)
-                .orElseThrow(() -> new RuntimeException("Ruolo non trovato"));
-
-
-        User user = userMapperDTO.toEntity(userDTO);
-
-        // Importante!!!!!!!!!!!!!!
-        Set<Role> roles = user.getRoles() != null ? Collections.synchronizedSet(new HashSet<>(user.getRoles())) : new HashSet<>();
-        roles.add(role);
-        user.setRoles(roles);
-
-        user = userRepository.save(user);
-
-        return userMapperDTO.toDto(user);
+    if (userRepository.existsByEmail(userDTO.getEmail())) {
+      throw new IllegalStateException("Email già in uso!");
     }
 
+    // Fetch All roles from database
+    Set<Role> availableRoles = new HashSet<>(roleRepository.findAll());
 
+    // Mapper from dto to user
+    User user = userMapperDTO.toEntity(userDTO, availableRoles);
 
-    public UserDTO getUserById(Long id){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
-        return userMapperDTO.toDto(user);
+    // Save to database
+    user = userRepository.save(user);
+
+    // Mapper from user to dto
+    return userMapperDTO.toDto(user);
+  }
+
+  public UserDTO getUserById(Long id) {
+    User user =
+        userRepository.findById(id).orElseThrow(() -> new RuntimeException("Ruolo non trovato"));
+    return userMapperDTO.toDto(user);
+  }
+
+  public List<UserDTO> getAllUsers() {
+    List<User> users = userRepository.findAll();
+    return users.stream().map(userMapperDTO::toDto).collect(Collectors.toList());
+  }
+
+  public void deleteUser(Long id) {
+    if (!userRepository.existsById(id)) {
+      throw new EntityNotFoundException("User non trovato");
     }
-    public List<User> getAllUser(){
-        System.out.println("CIAO");
-        List<User> list = userRepository.findAll();
-        System.out.println(list);
-        return list;
-    }
-    public void deleteUser(Long id){
-        if (!userRepository.existsById(id)){
-            throw new EntityNotFoundException("User non trovato");
-        }
-        userRepository.deleteById(id);
-    }
-    public UserDTO updateUser(Long id,UserDTO userDTO){
-        User user = userRepository.findById(id).orElseThrow(()-> new RuntimeException("Ruolo non trovato"));
-        user = userMapperDTO.updateUser(userDTO,user);
-        user = userRepository.save(user);
-        return userMapperDTO.toDto(user);
-    }
+    userRepository.deleteById(id);
+  }
+
+  public UserDTO updateUser(Long id, UserDTO userDTO) {
+
+    User user =
+        userRepository.findById(id).orElseThrow(() -> new RuntimeException("Utente non trovato"));
+
+    Set<Role> availableRoles = new HashSet<>(roleRepository.findAll());
+
+    user = userMapperDTO.updateUser(userDTO, user, availableRoles);
+
+    user = userRepository.save(user);
+
+    return userMapperDTO.toDto(user);
+  }
 }

@@ -6,6 +6,7 @@ import com.epicode.LastBuildWeek.payload.UserDTO;
 import lombok.Data;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -13,53 +14,89 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapperDTO {
 
-    public UserDTO toDto(User entity){
+    public UserDTO toDto(User entity) {
         UserDTO dto = new UserDTO();
         dto.setAvatar(entity.getAvatar());
         dto.setNome(entity.getNome());
-        dto.setRoles(entity.getRoles());
         dto.setCognome(entity.getCognome());
         dto.setEmail(entity.getEmail());
         dto.setPassword(entity.getPassword());
         dto.setUsername(entity.getUsername());
+
+        // Convert Set<Role> to Set<String>
+        Set<String> roleNames = entity.getRoles().stream()
+                .map(Role::getName)
+                .map(Enum::name)  // Convert UserRole to String
+                .collect(Collectors.toSet());
+        dto.setRoles(roleNames);
+
         return dto;
     }
 
-    public User toEntity(UserDTO dto){
+    public User toEntity(UserDTO dto, Set<Role> availableRoles) {
         User entity = new User();
         entity.setAvatar(dto.getAvatar());
         entity.setNome(dto.getNome());
-        entity.setRoles(dto.getRoles());
         entity.setCognome(dto.getCognome());
         entity.setEmail(dto.getEmail());
         entity.setPassword(dto.getPassword());
         entity.setUsername(dto.getUsername());
+
+        //Checking `null` before `stream()`
+        if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {
+            Set<Role> roles = dto.getRoles().stream()
+                    .map(roleName -> availableRoles.stream()
+                            .filter(role -> role.getName().name().equalsIgnoreCase(roleName))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Ruolo non trovato: " + roleName))
+                    )
+                    .collect(Collectors.toSet());
+            entity.setRoles(roles);
+        } else {
+            // If `roles` has no value, set the `USER` role as the default.
+            Role defaultRole = availableRoles.stream()
+                    .filter(role -> role.getName().name().equalsIgnoreCase("USER"))
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Ruolo USER non trovato nel database!"));
+            entity.setRoles(Collections.singleton(defaultRole));
+        }
+
         return entity;
     }
 
-    public User updateUser(UserDTO userDTO, User user){
-        if (userDTO.getAvatar() != null){
+
+    public User updateUser(UserDTO userDTO, User user, Set<Role> availableRoles) {
+        if (userDTO.getAvatar() != null) {
             user.setAvatar(userDTO.getAvatar());
         }
-        if (userDTO.getNome() != null){
+        if (userDTO.getNome() != null) {
             user.setNome(userDTO.getNome());
         }
-        if (userDTO.getRoles() != null){
-            user.setRoles(userDTO.getRoles());
-        }
-        if (userDTO.getCognome() != null){
+        if (userDTO.getCognome() != null) {
             user.setCognome(userDTO.getCognome());
         }
-        if (userDTO.getEmail() != null){
+        if (userDTO.getEmail() != null) {
             user.setEmail(userDTO.getEmail());
         }
-        if (userDTO.getPassword() != null){
+        if (userDTO.getPassword() != null) {
             user.setPassword(userDTO.getPassword());
         }
-        if (userDTO.getUsername() != null){
+        if (userDTO.getUsername() != null) {
             user.setUsername(userDTO.getUsername());
         }
+
+        if (userDTO.getRoles() != null) {
+            // Convert `Set<String>` to `Set<Role>`
+            Set<Role> roles = userDTO.getRoles().stream()
+                    .map(roleName -> availableRoles.stream()
+                            .filter(role -> role.getName().name().equalsIgnoreCase(roleName))
+                            .findFirst()
+                            .orElseThrow(() -> new RuntimeException("Ruolo non trovato: " + roleName))
+                    )
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
         return user;
     }
-
 }
