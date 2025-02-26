@@ -16,6 +16,7 @@ public class UserMapperDTO {
 
     public UserDTO toDto(User entity) {
         UserDTO dto = new UserDTO();
+        dto.setId(entity.getId());
         dto.setAvatar(entity.getAvatar());
         dto.setNome(entity.getNome());
         dto.setCognome(entity.getCognome());

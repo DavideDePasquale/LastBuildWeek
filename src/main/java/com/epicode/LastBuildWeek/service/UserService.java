@@ -1,5 +1,7 @@
 package com.epicode.LastBuildWeek.service;
 
+import com.cloudinary.utils.ObjectUtils;
+import com.epicode.LastBuildWeek.configuration.CloudinaryConfig;
 import com.epicode.LastBuildWeek.enumeration.UserRole;
 import com.epicode.LastBuildWeek.model.Role;
 import com.epicode.LastBuildWeek.model.User;
@@ -10,11 +12,10 @@ import com.epicode.LastBuildWeek.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,6 +24,7 @@ public class UserService {
   @Autowired UserRepository userRepository;
   @Autowired UserMapperDTO userMapperDTO;
   @Autowired RoleRepository roleRepository;
+  @Autowired CloudinaryConfig cloudinaryConfig;
 
   public UserDTO registerUser(UserDTO userDTO) {
 
@@ -73,5 +75,16 @@ public class UserService {
     user = userRepository.save(user);
 
     return userMapperDTO.toDto(user);
+  }
+
+  public String uploadImage(Long id, MultipartFile file) throws IOException {
+    User user = userRepository.findById(id).orElseThrow(()->new EntityNotFoundException("User non trovato!"));
+    Map uploadResult = cloudinaryConfig.uploader().uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+   // System.out.println("SONO QUI" + uploadResult.get("url"));
+    String imageUrl = (String) uploadResult.get("url");
+    user.setAvatar(imageUrl);
+    userRepository.save(user);
+
+    return imageUrl;
   }
 }
