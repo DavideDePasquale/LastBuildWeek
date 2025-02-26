@@ -58,10 +58,9 @@ public class CsvService {
             }
             String [] data = line.split(";");
             if (data.length >= 3){
-                String provinceName = data[2];
 
-                Province province = provinceRepository.findByNome(provinceName).orElseThrow(()-> new RuntimeException("Codice non trovato"));
-
+                String provinceName = data[3].trim();
+                Province province = provinceRepository.findByNomeIgnoreCase(provinceName).orElseThrow(()-> new RuntimeException("Codice non trovato"));
                 Comune comune = new Comune();
                 comune.setNome(data[2]);
                 comune.setProvince(province);
