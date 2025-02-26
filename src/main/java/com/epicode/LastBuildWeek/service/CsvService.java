@@ -1,5 +1,6 @@
 package com.epicode.LastBuildWeek.service;
 
+import com.epicode.LastBuildWeek.model.Comune;
 import com.epicode.LastBuildWeek.model.Province;
 import com.epicode.LastBuildWeek.repository.ComuneRepository;
 import com.epicode.LastBuildWeek.repository.ProvinceRepository;
@@ -37,7 +38,36 @@ public class CsvService {
            if (data.length >= 3 ){
                Province province = new Province(data[0],data[1],data[2],new ArrayList<>());
                provinces.add(province);
+
            }
+
        }
+
+        provinceRepository.saveAll(provinces);
+    }
+    public void importComuni(MultipartFile file) throws IOException{
+        List<Comune> comuni = new ArrayList<>();
+        //legge il file e dopo converte.
+        BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream(),StandardCharsets.UTF_8));
+        String line;
+        boolean firstLine = true;
+        while ((line = br.readLine()) != null){
+            if (firstLine){
+                firstLine = false;
+                continue;
+            }
+            String [] data = line.split(";");
+            if (data.length >= 3){
+                String provinceCode = data[0];
+                Province province = provinceRepository.findById(Long.valueOf(provinceCode)).orElseThrow(()-> new RuntimeException("Codice non trovato"));
+                Comune comune = new Comune();
+                comune.setNome(data[2]);
+                comune.setProvince(province);
+                comuni.add(comune);
+            }
+
+        }
+        comuneRepository.saveAll(comuni);
+
     }
 }

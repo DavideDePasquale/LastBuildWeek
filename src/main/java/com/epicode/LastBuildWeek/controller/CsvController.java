@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+
 @RestController
 @RequestMapping("/csv")
 public class CsvController {
@@ -24,6 +26,15 @@ public class CsvController {
             return ResponseEntity.ok("PROVINCE AGGIUNTE AL DB!☑️");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nell'aggiunta di Province nel db!👎" + e.getMessage());
+        }
+    }
+    @PostMapping("/comuni")
+    public ResponseEntity<String> uploadComuni(@RequestParam MultipartFile file){
+        try {
+            csvService.importComuni(file);
+            return ResponseEntity.ok("COMUNI AGGIUNGI AL DB!🏖️");
+        } catch (IOException e) {
+           return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Errore nell'aggiunta dei Comuni nel db!❌" + e.getMessage());
         }
     }
 }

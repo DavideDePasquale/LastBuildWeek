@@ -19,15 +19,15 @@ public class Province {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String nome;
-    @Column(length = 2)
+
     private String sigla;
     private String regione;
     @OneToMany(mappedBy = "province",cascade = CascadeType.ALL)
     private List<Comune> comunes;
 
-    public Province(String nome, String sigla, String regione, List<Comune> comunes) {
-        this.nome = nome;
+    public Province(String sigla, String nome, String regione, List<Comune> comunes) {
         this.sigla = sigla;
+        this.nome = nome;
         this.regione = regione;
         this.comunes = comunes;
     }

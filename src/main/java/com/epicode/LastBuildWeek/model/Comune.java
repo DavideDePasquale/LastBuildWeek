@@ -19,4 +19,10 @@ public class Comune {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "province_id")
     private Province province;
+
+
+    public Comune(String nome, Province province) {
+        this.nome = nome;
+        this.province = province;
+    }
 }
