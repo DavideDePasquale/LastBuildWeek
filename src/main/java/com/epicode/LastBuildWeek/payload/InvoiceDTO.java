@@ -12,6 +12,7 @@ import java.time.LocalDate;
 public class InvoiceDTO {
 
 
+    private Long id;
     private LocalDate data;
     private BigDecimal importo;
     private String numero;

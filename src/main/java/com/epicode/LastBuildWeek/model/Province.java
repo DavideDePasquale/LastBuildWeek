@@ -25,4 +25,10 @@ public class Province {
     @OneToMany(mappedBy = "province",cascade = CascadeType.ALL)
     private List<Comune> comunes;
 
+    public Province(String nome, String sigla, String regione, List<Comune> comunes) {
+        this.nome = nome;
+        this.sigla = sigla;
+        this.regione = regione;
+        this.comunes = comunes;
+    }
 }

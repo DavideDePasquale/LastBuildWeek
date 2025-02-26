@@ -8,6 +8,9 @@ import com.epicode.LastBuildWeek.repository.ClientRepository;
 import com.epicode.LastBuildWeek.repository.InvoiceRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,15 +31,12 @@ public class InvoiceService {
         Invoice invoice = invoiceMapperDTO.toEntity(invoiceDTO);
         invoice.setClient(client);
         invoice = invoiceRepository.save(invoice);
-        return invoiceMapperDTO.toDto(invoice);
+        return invoiceMapperDTO.toDtoResponse(invoice);
 
     }
     public InvoiceDTO getInvoiceById(Long id){
         Invoice invoice = invoiceRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Fattura non trovata!"));
-        return invoiceMapperDTO.toDto(invoice);
-    }
-    public List<Invoice> getInvoiceByClient(Long client_id){
-       return invoiceRepository.findAllByClient_Id(client_id);
+        return invoiceMapperDTO.toDtoRequest(invoice);
     }
     public void deleteInvoice(Long id){
         if (!invoiceRepository.existsById(id)){
@@ -44,11 +44,18 @@ public class InvoiceService {
         }
         invoiceRepository.deleteById(id);
     }
-
     public InvoiceDTO updateInvoice(Long id, InvoiceDTO invoiceDTO){
         Invoice invoice = invoiceRepository.findById(id).orElseThrow(()-> new EntityNotFoundException("Fattura non trovata!"));
         invoice = invoiceMapperDTO.updateInvoice(invoice,invoiceDTO);
         invoice = invoiceRepository.save(invoice);
-        return invoiceMapperDTO.toDto(invoice);
+        return invoiceMapperDTO.toDtoRequest(invoice);
     }
+    public Page<InvoiceDTO> getInvoiceByClient(Long client_id,int page, int size){
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Invoice> invoicePage = invoiceRepository.findAllByClient_Id(client_id,pageable);
+        return invoicePage.map(invoiceMapperDTO::toDtoResponse);
+    }
+
+
+
 }

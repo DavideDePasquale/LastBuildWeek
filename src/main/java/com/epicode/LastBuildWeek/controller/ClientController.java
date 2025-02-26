@@ -18,8 +18,6 @@ public class ClientController {
     @Autowired
     ClientService clientService;
 
-
-
     @PostMapping
     public ResponseEntity<ClientDTO> createClient(@RequestBody @Validated ClientDTO clientDTO){
      return  ResponseEntity.status(HttpStatus.CREATED).body(clientService.createClient(clientDTO));

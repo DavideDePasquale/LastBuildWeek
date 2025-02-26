@@ -4,6 +4,7 @@ import com.epicode.LastBuildWeek.model.Invoice;
 import com.epicode.LastBuildWeek.payload.InvoiceDTO;
 import com.epicode.LastBuildWeek.service.InvoiceService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
@@ -29,8 +30,8 @@ public class InvoiceController {
         return ResponseEntity.ok(invoiceService.getInvoiceById(id));
     }
     @GetMapping("/client/{client_id}")
-    public ResponseEntity<List<Invoice>> getAllInvoiceByClient(@PathVariable Long client_id){
-        return ResponseEntity.ok(invoiceService.getInvoiceByClient(client_id));
+    public ResponseEntity<Page<InvoiceDTO>> getAllInvoiceByClient(@PathVariable Long client_id, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size){
+        return ResponseEntity.ok(invoiceService.getInvoiceByClient(client_id,page,size));
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteInvoice(@PathVariable Long id){
