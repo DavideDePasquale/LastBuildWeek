@@ -6,6 +6,9 @@ import com.epicode.LastBuildWeek.payload.mapper.ClientMapperDTO;
 import com.epicode.LastBuildWeek.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -33,8 +36,11 @@ public class ClientService {
         Client client = clientRepository.findById(id).orElseThrow(()-> new RuntimeException("Cliente non trovato"));
         return clientMapperDTO.toDto(client);
     }
-    public List<ClientDTO> getAllClients(){
-        return clientRepository.findAll().stream().map(clientMapperDTO::toDto).collect(Collectors.toList());
+    public Page<ClientDTO> getAllClients(int page, int size){
+        Pageable pageable = PageRequest.of(page,size);
+        Page<Client> clientPage = clientRepository.findAll(pageable);
+
+        return clientPage.map(clientMapperDTO::toDto);
     }
 
     public void deleteClient(Long id){

@@ -36,7 +36,7 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserById(id));
     }
     @PostMapping("/register")
-    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<UserDTO> registerUser(@RequestBody UserDTO userDTO) throws InterruptedException {
         UserDTO dto = userService.registerUser(userDTO);
         return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
@@ -50,21 +50,14 @@ public class UserController {
     public ResponseEntity<UserDTO> updteUser(@PathVariable Long id, UserDTO userDTO){
         return ResponseEntity.ok(userService.updateUser(id,userDTO));
     }
-    @Transactional
-    @PostMapping(value = "/avatar",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<?> createUserWithPhoto(@RequestPart("user") UserDTO userDTO, @RequestPart("file")MultipartFile file){
 
+    @PostMapping(value = "/avatar",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<UserDTO> createUserWithPhoto(@RequestPart("user") UserDTO userDTO, @RequestPart("file")MultipartFile file){
          try {
-             UserDTO savedUser = userService.registerUser(userDTO);
-             System.out.println(savedUser + "ciaoooooooooooo");
-             Long id = savedUser.getId();
-             String imageUrl = userService.uploadImage(id, file);
-             System.out.println(savedUser + imageUrl);
+             UserDTO savedUser = userService.uploadImage(userDTO, file);
              return ResponseEntity.status(HttpStatus.CREATED).body(savedUser);
          } catch (Exception e) {
              return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
          }
-
-
     }
 }

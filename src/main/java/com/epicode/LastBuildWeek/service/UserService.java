@@ -26,7 +26,7 @@ public class UserService {
   @Autowired RoleRepository roleRepository;
   @Autowired CloudinaryConfig cloudinaryConfig;
 
-  public UserDTO registerUser(UserDTO userDTO) {
+  public UserDTO registerUser(UserDTO userDTO) throws InterruptedException {
 
     if (userRepository.existsByEmail(userDTO.getEmail())) {
       throw new IllegalStateException("Email già in uso!");
@@ -40,6 +40,9 @@ public class UserService {
 
     // Save to database
     user = userRepository.save(user);
+
+    userRepository.flush();
+    Thread.sleep(200);
 
     // Mapper from user to dto
     return userMapperDTO.toDto(user);
@@ -77,14 +80,16 @@ public class UserService {
     return userMapperDTO.toDto(user);
   }
 
-  public String uploadImage(Long id, MultipartFile file) throws IOException {
-    User user = userRepository.findById(id).orElseThrow(()->new EntityNotFoundException("User non trovato!"));
+  public UserDTO uploadImage(UserDTO userDTO, MultipartFile file) throws IOException {
+
     Map uploadResult = cloudinaryConfig.uploader().uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
    // System.out.println("SONO QUI" + uploadResult.get("url"));
     String imageUrl = (String) uploadResult.get("url");
-    user.setAvatar(imageUrl);
-    userRepository.save(user);
-
-    return imageUrl;
+    userDTO.setAvatar(imageUrl);
+    // Fetch All roles from database
+    Set<Role> availableRoles = new HashSet<>(roleRepository.findAll());
+    User user = userMapperDTO.toEntity(userDTO,availableRoles);
+    user = userRepository.save(user);
+    return userMapperDTO.toDto(user);
   }
 }
