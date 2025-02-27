@@ -1,17 +1,26 @@
 package com.epicode.LastBuildWeek.service;
 
+import com.epicode.LastBuildWeek.enumeration.InvoiceType;
 import com.epicode.LastBuildWeek.model.Client;
+import com.epicode.LastBuildWeek.model.Invoice;
 import com.epicode.LastBuildWeek.payload.ClientDTO;
+import com.epicode.LastBuildWeek.payload.InvoiceDTO;
 import com.epicode.LastBuildWeek.payload.mapper.ClientMapperDTO;
 import com.epicode.LastBuildWeek.repository.ClientRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.criteria.CriteriaBuilder;
+import jakarta.persistence.criteria.CriteriaQuery;
+import jakarta.persistence.criteria.Predicate;
+import jakarta.persistence.criteria.Root;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -58,12 +67,37 @@ public class ClientService {
         return clientMapperDTO.toDto(client);
     }
 
-    public Page<ClientDTO> getClients(int page, int size, String sortBy, String direction){
+    public Page<ClientDTO> getClients(int page, int size, String sortBy, String direction, BigDecimal minAmount, BigDecimal maxAmount, String partOfName,String date, String invoiceType){
+       Specification<Client> spec = filterInvoices(partOfName,invoiceType,date,minAmount,maxAmount);
         Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+
         Pageable pageable = PageRequest.of(page, size,sort);
+
         Page<Client> clientPage = clientRepository.findAll(pageable);
+
         return clientPage.map(clientMapperDTO::toDto);
     }
 
+    public Specification<Invoice> filterInvoices(String clientName, String invoiceType, String date, BigDecimal minAmount, BigDecimal maxAmount) {
+        return (Root<Invoice> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
+            Predicate predicate = cb.conjunction();
+            if (clientName != null) {
+                predicate = cb.and(predicate, cb.like(root.get("Client").get("ragioneSociale"), "%" + clientName + "%"));
+            }
+            if (invoiceType != null) {
+                predicate = cb.and(predicate, cb.equal(root.get("InvoiceType"), invoiceType));
+            }
+            if (date != null) {
+                predicate = cb.and(predicate, cb.equal(root.get("date"), date));
+            }
+            if (minAmount != null) {
+                predicate = cb.and(predicate, cb.greaterThan(root.get("importo"), minAmount));
+            }
+            if (maxAmount != null) {
+                predicate = cb.and(predicate, cb.lessThanOrEqualTo(root.get("importo"), maxAmount));
+            }
+            return predicate;
 
+        };
+    }
 }
