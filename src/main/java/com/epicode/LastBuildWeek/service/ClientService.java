@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -57,6 +58,12 @@ public class ClientService {
         return clientMapperDTO.toDto(client);
     }
 
+    public Page<ClientDTO> getClients(int page, int size, String sortBy, String direction){
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size,sort);
+        Page<Client> clientPage = clientRepository.findAll(pageable);
+        return clientPage.map(clientMapperDTO::toDto);
+    }
 
 
 }

@@ -1,5 +1,6 @@
 package com.epicode.LastBuildWeek.controller;
 
+import com.epicode.LastBuildWeek.model.Client;
 import com.epicode.LastBuildWeek.payload.ClientDTO;
 import com.epicode.LastBuildWeek.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,4 +40,9 @@ public class ClientController {
         clientService.deleteClient(id);
         return new ResponseEntity<>("Cliente eliminato con successo!👌", HttpStatus.OK);
     }
+    @GetMapping("/getclient")
+    public Page<ClientDTO> getClients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "nomeContatto") String sortBy, @RequestParam(defaultValue = "asc") String direction){
+        return clientService.getClients(page,size,sortBy,direction);
+    }
+
 }
