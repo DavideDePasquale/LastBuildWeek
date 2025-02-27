@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 public class SendGridConfig {
 
     // impostare la costante proveniente dal file properties
-   // @Value("${send.grid.key}") String sendGridKey;
+   @Value("${SENDGRID_API_KEY}") String sendGridKey;
 
     @Bean
     public SendGrid configurazioneMail(){
