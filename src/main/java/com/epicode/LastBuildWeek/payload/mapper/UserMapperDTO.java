@@ -4,6 +4,8 @@ import com.epicode.LastBuildWeek.model.Role;
 import com.epicode.LastBuildWeek.model.User;
 import com.epicode.LastBuildWeek.payload.UserDTO;
 import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 @Data
 @Component
 public class UserMapperDTO {
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     public UserDTO toDto(User entity) {
         UserDTO dto = new UserDTO();
@@ -21,6 +25,8 @@ public class UserMapperDTO {
         dto.setNome(entity.getNome());
         dto.setCognome(entity.getCognome());
         dto.setEmail(entity.getEmail());
+
+
         dto.setPassword(entity.getPassword());
         dto.setUsername(entity.getUsername());
 
@@ -40,7 +46,7 @@ public class UserMapperDTO {
         entity.setNome(dto.getNome());
         entity.setCognome(dto.getCognome());
         entity.setEmail(dto.getEmail());
-        entity.setPassword(dto.getPassword());
+        entity.setPassword(passwordEncoder.encode(dto.getPassword()));
         entity.setUsername(dto.getUsername());
 
         //Checking `null` before `stream()`

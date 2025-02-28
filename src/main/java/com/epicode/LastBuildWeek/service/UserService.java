@@ -5,12 +5,19 @@ import com.epicode.LastBuildWeek.configuration.CloudinaryConfig;
 import com.epicode.LastBuildWeek.enumeration.UserRole;
 import com.epicode.LastBuildWeek.model.Role;
 import com.epicode.LastBuildWeek.model.User;
+import com.epicode.LastBuildWeek.payload.LoginResponse;
 import com.epicode.LastBuildWeek.payload.UserDTO;
 import com.epicode.LastBuildWeek.payload.mapper.UserMapperDTO;
 import com.epicode.LastBuildWeek.repository.RoleRepository;
 import com.epicode.LastBuildWeek.repository.UserRepository;
+import com.epicode.LastBuildWeek.security.JwtUtils;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,6 +32,9 @@ public class UserService {
   @Autowired UserMapperDTO userMapperDTO;
   @Autowired RoleRepository roleRepository;
   @Autowired CloudinaryConfig cloudinaryConfig;
+  @Autowired PasswordEncoder passwordEncoder;
+  @Autowired AuthenticationManager authenticationManager;
+  @Autowired JwtUtils jwtUtils;
 
   public UserDTO registerUser(UserDTO userDTO) throws InterruptedException {
 
@@ -92,4 +102,6 @@ public class UserService {
     user = userRepository.save(user);
     return userMapperDTO.toDto(user);
   }
+
+
 }

@@ -7,7 +7,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface UserRepository extends JpaRepository<User,Long> {
+
+    //Recupero utente da Username
     Optional<User> findByUsername(String username);
-    boolean existsByEmail(String email);
+
+
+
     List<User> findAll();
+    // ricerche chiavi che non devono essere duplicate!!
+    boolean existsByUsername(String username);
+    boolean existsByEmail(String email);
 }
