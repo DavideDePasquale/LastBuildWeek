@@ -11,8 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -53,6 +57,19 @@ public class InvoiceService {
     public Page<InvoiceDTO> getInvoiceByClient(Long client_id,int page, int size){
         Pageable pageable = PageRequest.of(page,size);
         Page<Invoice> invoicePage = invoiceRepository.findAllByClient_Id(client_id,pageable);
+        return invoicePage.map(invoiceMapperDTO::toDtoResponse);
+    }
+    public Page<InvoiceDTO> getInvoices(
+            int page, int size, String sortBy, String direction,
+            String clientName, String invoiceType, LocalDate date,
+            BigDecimal minAmount, BigDecimal maxAmount) {
+
+        Specification<Invoice> spec = InvoiceSpecification.filterInvoices(clientName, invoiceType, date, minAmount, maxAmount);
+
+        Sort sort = direction.equalsIgnoreCase("desc") ? Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        Page<Invoice> invoicePage = invoiceRepository.findAll(spec, pageable);
         return invoicePage.map(invoiceMapperDTO::toDtoResponse);
     }
 

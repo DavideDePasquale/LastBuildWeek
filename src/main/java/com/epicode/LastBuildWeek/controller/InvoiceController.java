@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -41,6 +43,21 @@ public class InvoiceController {
     @PutMapping("/{id}")
     public ResponseEntity<InvoiceDTO> updateInvoice(@PathVariable Long id,  @RequestBody InvoiceDTO invoiceDTO){
         return ResponseEntity.ok(invoiceService.updateInvoice(id,invoiceDTO));
+    }
+    @GetMapping("/search")
+    public ResponseEntity<Page<InvoiceDTO>> searchInvoices(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "data") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) String clientName,
+            @RequestParam(required = false) String invoiceType,
+            @RequestParam(required = false) LocalDate date,
+            @RequestParam(required = false) BigDecimal minAmount,
+            @RequestParam(required = false) BigDecimal maxAmount) {
+
+        Page<InvoiceDTO> invoices = invoiceService.getInvoices(page, size, sortBy, direction, clientName, invoiceType, date, minAmount, maxAmount);
+        return ResponseEntity.ok(invoices);
     }
 
 

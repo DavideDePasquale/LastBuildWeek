@@ -10,6 +10,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -40,9 +42,21 @@ public class ClientController {
         clientService.deleteClient(id);
         return new ResponseEntity<>("Cliente eliminato con successo!👌", HttpStatus.OK);
     }
-    @GetMapping("/getclient")
-    public Page<ClientDTO> getClients(@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int size, @RequestParam(defaultValue = "nomeContatto") String sortBy, @RequestParam(defaultValue = "asc") String direction){
-        return clientService.getClients(page,size,sortBy,direction);
+    @GetMapping("/search")
+    public ResponseEntity<Page<ClientDTO>> searchClients(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "ragioneSociale") String sortBy,
+            @RequestParam(defaultValue = "asc") String direction,
+            @RequestParam(required = false) BigDecimal minRevenue,
+            @RequestParam(required = false) BigDecimal maxRevenue,
+            @RequestParam(required = false) String partOfName,
+            @RequestParam(required = false) LocalDate insertDate,
+            @RequestParam(required = false) LocalDate lastContactDate,
+            @RequestParam(required = false) String province) {
+
+        Page<ClientDTO> clients = clientService.getClients(page, size, sortBy, direction, minRevenue, maxRevenue, partOfName, insertDate, lastContactDate, province);
+        return ResponseEntity.ok(clients);
     }
 
 }
