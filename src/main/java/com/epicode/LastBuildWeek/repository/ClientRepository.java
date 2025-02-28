@@ -22,6 +22,6 @@ public interface ClientRepository extends JpaRepository<Client,Long>, JpaSpecifi
     Page<Client> findByRagioneSocialeContainingIgnoreCase(String nome, Pageable pageable);
     Page<Client> findByFatturatoAnnualeBetween(BigDecimal min, BigDecimal max, Pageable pageable);
     Page<Client> findByDataInserimentoBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
-    Page<Client> findByDataUltimoContattoBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<Client> findByUltimoContattoBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
 
 }
